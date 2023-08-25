@@ -1,6 +1,9 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
+import { useAuthStore } from '@/stores/auth';
+const authStore = useAuthStore()
+authStore.setUser()
 </script>
 
 <template>
@@ -13,7 +16,8 @@ import HelloWorld from './components/HelloWorld.vue'
       <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
-        <RouterLink to="/test">Test</RouterLink>
+        <RouterLink to="/todo">Test</RouterLink>
+        <RouterLink to="/login">Login</RouterLink>
         <!-- <RouterLink :to="{name: 'test'}">Test2</RouterLink> -->
       </nav>
     </div>

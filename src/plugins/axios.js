@@ -8,11 +8,15 @@ const api = axios.create({
 api.interceptors.request.use(
     (config) => {
         const token = getCookie('auth')
-        if(!token) {
-            delCookie('auth')
-            return config
-        }
+        if(token) {
         config.headers.Authorization = `Bearer ${token}`
+        }
+        else{
+            delCookie('auth')
+            delete config.headers.Authorization
+        }
+        return config
+
     },
     (err) => {
         throw new err
@@ -21,11 +25,15 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
     (response) => response.data,
-    (err) => {
-        if(err.response.status === 401){
-            delCookie('auth')
-        }
-        throw err
+    (error) => {
+        switch (error.response.status) {
+      case 401:
+        delCookie('CERT')
+        break
+      default:
+        break
+    }
+    throw error?.response?.data ?? error
     }
 )
 

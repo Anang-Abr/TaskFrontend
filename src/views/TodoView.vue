@@ -1,6 +1,6 @@
 <script setup>
     import NormalInput from "@/components/NormalInput.vue"
-    import { reactive } from "vue";
+    import { onMounted, reactive } from "vue";
     import { useListStore } from "@/stores/list"
 
     const INPUT_PROPS = {
@@ -14,24 +14,37 @@
 
     function clearInput() {
         Object.assign(input, INPUT_PROPS)
-
     }
 
     function handleSubmit(){
-        if (Object.values(input).indexOf('') == 0) return
-        const data = {
-            ...input,
-            description: "lotem ipsum"
+        try {  
+            if (Object.values(input).indexOf('') == 0) return
+            const data = {
+                ...input,
+                description: "lotem ipsum",
+                category: 'A'
+            }
+            store.insertListData(data)
+            clearInput()
+        } catch (error) {
+            alert(error)
         }
-        store.insertListData(data)
-        clearInput()
     }
 
     function handleDelete(index){
-        // console.log("delete", index)
         store.removeListData(index)
     }
 
+    function handleDone(index, body){
+        store.updateList(index, {...body, completed: true})
+    }
+    function handleUnone(index, body){
+        store.updateList(index, {...body, completed: false})
+    }
+
+onMounted(()=>{
+    store.initList()
+})
 </script>
 
 <template>
@@ -48,11 +61,18 @@
     </form>
     <ol>
         <template v-for="(item, index) in store.getList" :key="index">
-            <li>{{ item.title }}<button @click="()=>handleDelete(index)">hapus</button></li>
+            <li :class="{'done': item.completed}" >{{ item.title }} 
+                <button @click="()=>handleDelete(item.id)">hapus</button>
+                <button v-if="!item.completed" @click="()=>handleDone(item.id, item)">Mark As Done</button>
+                <button v-else @click="()=>handleUnone(item.id, item)">Undone</button>
+            </li>
         </template>
     </ol>
     </div>
 </template>
 
 <style scoped>
+    .done{
+        text-decoration: line-through;
+    }
 </style>
